@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
+import DataTable, { createTheme } from 'react-data-table-component';
 import {
-  Alert,
   Table,
   Row,
   Col,
@@ -15,9 +15,37 @@ import billing from '../../api/billing';
 import FullLayout from '../Layouts/FullLayout';
 import requireAuth from '../../helpers/requireAuth';
 
+const columns = [
+  {
+    name: 'Product Code',
+    selector: 'product_code',
+  },
+  {
+    name: 'Product Name',
+    selector: 'product_name',
+    sortable: true,
+  },
+  {
+    name: 'Unit Cost',
+    selector: 'unit_cost',
+    sortable: true,
+  },
+  {
+    name: 'Qty',
+    selector: 'qty',
+    sortable: true,
+  },
+  {
+    name: 'Remaining Qty',
+    selector: 'rem_qty',
+    sortable: true,
+  },
+];
+
 class StockSummary extends Component {
   state = {
     items: [],
+    filterText: '',
     fromDate: new Date().toISOString().slice(0, 10),
     toDate: new Date().toISOString().slice(0, 10),
     isLoading: false,
@@ -55,66 +83,94 @@ class StockSummary extends Component {
     }
   };
 
-  renderTableBody = () => {
-    const { items, isLoading } = this.state;
-    if (isLoading)
-      return (
-        <Spinner
-          color='dark'
-          style={{ display: 'flex', justifyContent: 'center' }}
-        />
-      );
-    return (
-      <>
-        <tbody>
-          {items.length > 0 ? (
-            items.map((item, idx) => (
-              <tr key={item.id}>
-                <td>{idx + 1}</td>
-                <td>{item.product_name}</td>
-                <td>{item.unit_cost}</td>
-                <td>{item.qty}</td>
-                <td>{item.rem_qty}</td>
-                <td>{Number(item.rem_qty * item.unit_cost).toFixed(2)}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan='6' className='text-center'>
-                No Item
-              </td>
-            </tr>
-          )}
-        </tbody>
-        {items.length > 0 ? (
-          <tfoot>
-            <tr>
-              <th colSpan='5'>Total</th>
-              <th>
-                {Number(
-                  items.reduce(
-                    (total, item) => total + item.rem_qty * item.unit_cost,
-                    0
-                  )
-                ).toFixed(2)}
-              </th>
-            </tr>
-          </tfoot>
-        ) : null}
-      </>
-    );
+  // renderTableBody = () => {
+  //   const { items, isLoading } = this.state;
+  //   if (isLoading)
+  //     return (
+  //       <Spinner
+  //         color='dark'
+  //         style={{ display: 'flex', justifyContent: 'center' }}
+  //       />
+  //     );
+  //   return (
+  //     <>
+  //       <tbody>
+  //         {items.length > 0 ? (
+  //           items.map((item, idx) => (
+  //             <tr key={item.id}>
+  //               <td>{idx + 1}</td>
+  //               <td>{item.product_name}</td>
+  //               <td>{item.unit_cost}</td>
+  //               <td>{item.qty}</td>
+  //               <td>{item.rem_qty}</td>
+  //               <td>{Number(item.rem_qty * item.unit_cost).toFixed(2)}</td>
+  //             </tr>
+  //           ))
+  //         ) : (
+  //           <tr>
+  //             <td colSpan='6' className='text-center'>
+  //               No Item
+  //             </td>
+  //           </tr>
+  //         )}
+  //       </tbody>
+  //       {items.length > 0 ? (
+  //         <tfoot>
+  //           <tr>
+  //             <th colSpan='5'>Total</th>
+  //             <th>
+  //               {Number(
+  //                 items.reduce(
+  //                   (total, item) => total + item.rem_qty * item.unit_cost,
+  //                   0
+  //                 )
+  //               ).toFixed(2)}
+  //             </th>
+  //           </tr>
+  //         </tfoot>
+  //       ) : null}
+  //     </>
+  //   );
+  // };
+
+  setFilterText = (e) => {
+    this.setState({ filterText: e.target.value });
   };
 
   render() {
-    const { fromDate, toDate } = this.state;
+    const { items, filterText } = this.state;
+    const filteredItems = items.filter(
+      (item) =>
+        item.product_name &&
+        item.product_name.toLowerCase().includes(filterText.toLowerCase())
+    );
     return (
       <FullLayout>
         <aside key='sidebar'>
-          <h1>Stock Summary Report</h1>
+          <input type='search' />
         </aside>
         <main key='main' className='card'>
           <div className='card-body'>
-            <Form className='mb-3' onSubmit={this.handleSubmit}>
+            <input
+              type='search'
+              placeholder='Search by Item Name'
+              className='form-control'
+              onChange={this.setFilterText}
+            />
+            <DataTable
+              title='Stock Summary'
+              columns={columns}
+              data={filteredItems}
+              pagination
+              fixedHeader
+              noDataComponent={
+                <Spinner
+                  color='dark'
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                />
+              }
+            />
+            {/* <Form className='mb-3' onSubmit={this.handleSubmit}>
               <Row>
                 <Col>
                   <FormGroup>
@@ -144,7 +200,7 @@ class StockSummary extends Component {
               </Row>
               <Button>Search</Button>
             </Form>
-            <Table bordered striped>
+            <Table bordered striped> 
               <thead>
                 <tr>
                   <th>SNo.</th>
@@ -156,7 +212,7 @@ class StockSummary extends Component {
                 </tr>
               </thead>
               {this.renderTableBody()}
-            </Table>
+            </Table>*/}
           </div>
         </main>
       </FullLayout>

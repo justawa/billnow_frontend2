@@ -15,6 +15,7 @@
     "react-autosuggest": "^10.0.3",
     "react-bootstrap-table-next": "^4.0.3",
     "react-bootstrap-table2-paginator": "^2.1.2",
+    "react-data-table-component": "^7.0.0-rc2",
     "react-dom": "^17.0.1",
     "react-js-pagination": "^3.0.3",
     "react-paginate": "^6.5.0",
@@ -26,6 +27,7 @@
     "reactstrap": "^8.6.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "styled-components": "^5.3.0",
     "uuid": "^8.3.1",
     "web-vitals": "^0.2.4"
   },
